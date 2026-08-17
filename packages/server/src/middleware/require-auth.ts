@@ -8,6 +8,14 @@ export type AuthenticatedEnv = {
 };
 
 export const requireAuth = createMiddleware<AuthenticatedEnv>(async (c, next) => {
+  // Dev bypass for local testing
+  if (process.env.DEV_BYPASS_AUTH === "true") {
+    const devUser = process.env.DEV_USER_ID || "dev-user";
+    c.set("userId", devUser as any);
+    await next();
+    return;
+  }
+
   try {
     const auth = await authenticateOAuthRequest(c.req.raw);
     if (!auth) {

@@ -10,6 +10,8 @@
     "db:generate": "bunx prisma generate"
   },
   "devDependencies": {
+    "@libsql/client": "^0.17.4",
+    "@prisma/adapter-libsql": "^7.9.1",
     "@types/node": "^25.5.2",
     "prisma": "^7.7.0"
   },

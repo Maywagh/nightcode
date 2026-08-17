@@ -1,5 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI, openai } from "@ai-sdk/openai";
 import {
   findSupportedChatModel,
   type SupportedChatModel,
@@ -11,7 +11,7 @@ import type { LanguageModel } from "ai";
 
 type AnthropicModelId = Extract<SupportedChatModel, { provider: "anthropic" }>["id"];
 type OpenAIModelId = Extract<SupportedChatModel, { provider: "openai" }>["id"];
-type GeminiModelId = Extract<SupportedChatModel, { provider: "google" }>["id"];
+type SarvamModelId = Extract<SupportedChatModel, { provider: "sarvam" }> ["id"];
 
 export type ResolvedModel = {
   model: LanguageModel;
@@ -71,6 +71,20 @@ function resolveOpenAIModel(modelId: OpenAIModelId): ResolvedModel {
   };
 };
 
+function resolveSarvamModel(modelId: SarvamModelId): ResolvedModel {
+  const sarvam = createOpenAI({
+    apiKey: process.env.SARVAM_API_KEY ?? "",
+    baseURL: process.env.SARVAM_BASE_URL ?? "https://api.sarvam.ai/v1",
+    name: "sarvam",
+  });
+
+  return {
+    model: sarvam.chat(modelId),
+    provider: "sarvam",
+    modelId,
+  };
+};
+
 function resolveSupportedChatModel(model: SupportedChatModel): ResolvedModel {
   const provider = model.provider;
 
@@ -79,6 +93,8 @@ function resolveSupportedChatModel(model: SupportedChatModel): ResolvedModel {
       return resolveAnthropicModel(model.id);
     case "openai":
       return resolveOpenAIModel(model.id);
+    case "sarvam":
+      return resolveSarvamModel(model.id);
     default:
       return assertUnsupportedProvider(provider);
   }

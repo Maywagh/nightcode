@@ -3,7 +3,7 @@ export type ModelPricing = {
   outputUsdPerMillionTokens: number;
 };
 
-export type SupportedProvider = "anthropic" | "openai";
+export type SupportedProvider = "anthropic" | "openai" | "sarvam";
 
 type SupportedChatModelDefinition = {
   id: string;
@@ -60,6 +60,22 @@ export const SUPPORTED_CHAT_MODELS = [
       outputUsdPerMillionTokens: 1.25,
     },
   },
+  {
+    id: "sarvam-105b",
+    provider: "sarvam",
+    pricing: {
+      inputUsdPerMillionTokens: 1.25,
+      outputUsdPerMillionTokens: 4.5,
+    },
+  },
+  {
+    id: "sarvam-105b-conversations",
+    provider: "sarvam",
+    pricing: {
+      inputUsdPerMillionTokens: 1.25,
+      outputUsdPerMillionTokens: 4.5,
+    },
+  },
 ] as const satisfies readonly SupportedChatModelDefinition[];
 
 export type SupportedChatModel = (typeof SUPPORTED_CHAT_MODELS)[number];
@@ -69,4 +85,5 @@ export function findSupportedChatModel(modelId: string) {
   return SUPPORTED_CHAT_MODELS.find((model) => model.id === modelId);
 }
 
-export const DEFAULT_CHAT_MODEL_ID: SupportedChatModelId = "claude-opus-4-6";
+export const DEFAULT_CHAT_MODEL_ID: SupportedChatModelId =
+  typeof process !== "undefined" && process.env?.SARVAM_API_KEY ? "sarvam-105b" : "claude-opus-4-6";

@@ -26,10 +26,29 @@ function isToolPart(part: ClientMessagePart): part is ToolPart {
   return part.type === "dynamic-tool" || part.type.startsWith("tool-");
 };
 
+function formatToolValue(value: unknown): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (Array.isArray(value)) {
+    return value.map(formatToolValue).filter(Boolean).join(" ");
+  }
+  if (typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([key, nestedValue]) => `${key}: ${formatToolValue(nestedValue)}`)
+      .join(" ");
+  }
+
+  return String(value);
+}
+
 function formatToolArgs(tc: ToolPart): string {
   if (!("input" in tc) || tc.input == null) return "";
   if (typeof tc.input !== "object") return String(tc.input);
-  return Object.values(tc.input).map(String).join(" ");
+  return Object.values(tc.input)
+    .map((value) => formatToolValue(value))
+    .filter(Boolean)
+    .join(" ");
 }
 
 type PartGroup = {

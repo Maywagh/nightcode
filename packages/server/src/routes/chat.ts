@@ -72,9 +72,26 @@ const app = new Hono<AuthenticatedEnv>()
       const userId = c.get("userId");
       const { id, messages, mode, model } = c.req.valid("json");
 
-      const session = await db.session.findUnique({
+      let session = await db.session.findUnique({
         where: { id, userId },
       });
+
+      // Dev helper: create a session on-the-fly for local testing when not found
+      if (!session && process.env.DEV_BYPASS_AUTH === "true") {
+        try {
+          session = await db.session.create({
+            data: {
+              id,
+              userId,
+              title: "Dev session",
+              messages: [],
+            },
+          });
+        } catch (err) {
+          console.error("Failed to create dev session", err);
+          return c.json({ error: "Session not found" }, 404);
+        }
+      }
 
       if (!session) {
         return c.json({ error: "Session not found" }, 404);
@@ -103,8 +120,11 @@ const app = new Hono<AuthenticatedEnv>()
         }
       }
 
+      // Sanitize messages: remove any malformed/empty messages that will fail provider validation
+      const sanitizedMessages = mergedMessages.filter((m) => Array.isArray((m as any).parts) && (m as any).parts.length > 0);
+
       const nextMessages = await validateUIMessages<NightcodeUIMessage>({
-        messages: mergedMessages,
+        messages: sanitizedMessages,
         tools,
       });
       const modelMessages = await convertToModelMessages(nextMessages, { tools });
@@ -173,8 +193,15 @@ const app = new Hono<AuthenticatedEnv>()
           }
         },
         onError(error) {
-          return error instanceof Error ? error.message : String(error);
+          if (error instanceof Error) return error.message;
+          try {
+            if (typeof error === 'string') return error;
+            return JSON.stringify(error);
+          } catch {
+            return String(error);
+          }
         },
+
       });
     },
   );

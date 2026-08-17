@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { requireAuth } from "./middleware/require-auth";
 import sessions from "./routes/sessions";
 import chat from "./routes/chat";
+import devChat from "./routes/dev-chat";
 import auth from "./routes/auth";
 import billing from "./routes/billing";
 
@@ -26,6 +27,7 @@ app.use("/billing/checkout", requireAuth);
 app.use("/billing/portal", requireAuth);
 
 const routes = app
+  .route("/dev-chat", devChat)
   .route("/auth", auth)
   .route("/billing", billing)
   .route("/sessions", sessions)
