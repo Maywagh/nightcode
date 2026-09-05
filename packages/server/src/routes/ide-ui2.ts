@@ -53,7 +53,7 @@ app.get("/", (c) => {
     require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.41.0/min/vs' } });
     require(['vs/editor/editor.main'], function () {
       const editor = monaco.editor.create(document.getElementById('editor'), {
-        value: `// Welcome to Yuktiio Web IDE\nfunction hello() {\n  console.log('Hello, Yuktiio!');\n}\n\nhello();`,
+        value: "// Welcome to Yuktiio Web IDE\\nfunction hello() {\\n  console.log('Hello, Yuktiio!');\\n}\\n\\nhello();",
         language: 'javascript',
         theme: 'vs-dark',
         automaticLayout: true,
