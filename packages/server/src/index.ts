@@ -10,8 +10,12 @@ import ideUi from "./routes/ide-ui2";
 import files from "./routes/files";
 import inline from "./routes/inline";
 import indexer from "./routes/indexer";
+import lsp from "./routes/lsp";
 import auth from "./routes/auth";
 import billing from "./routes/billing";
+
+// start file watcher (auto-import side-effect)
+import "./lib/watcher";
 
 const app = new Hono();
 
@@ -42,7 +46,8 @@ const routes = app
   .route("/ide/ui", ideUi)
   .route("/ide/files", files)
   .route("/ide/inline", inline)
-  .route("/ide/index", indexer);
+  .route("/ide/index", indexer)
+  .route("/ide/lsp", lsp);
 
 export type AppType = typeof routes;
 // idleTimeout must be high, otherwise LLM tool calls might not complete
