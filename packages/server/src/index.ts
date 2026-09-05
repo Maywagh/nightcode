@@ -13,6 +13,7 @@ import indexer from "./routes/indexer";
 import lsp from "./routes/lsp";
 import auth from "./routes/auth";
 import billing from "./routes/billing";
+import { rateLimit } from "./middleware/rate-limit";
 
 // start file watcher (auto-import side-effect)
 import "./lib/watcher";
@@ -33,6 +34,7 @@ app.onError((error, c) => {
 app.use("/sessions/*", requireAuth);
 app.use("/chat/*", requireAuth);
 app.use("/ide/*", requireAuth);
+app.use("/ide/*", rateLimit({ capacity: 120, refillPerSec: 2 }));
 app.use("/billing/checkout", requireAuth);
 app.use("/billing/portal", requireAuth);
 
