@@ -6,9 +6,10 @@ import sessions from "./routes/sessions";
 import chat from "./routes/chat";
 import devChat from "./routes/dev-chat";
 import ide from "./routes/ide";
-import ideUi from "./routes/ide-ui";
+import ideUi from "./routes/ide-ui2";
 import files from "./routes/files";
 import inline from "./routes/inline";
+import indexer from "./routes/indexer";
 import auth from "./routes/auth";
 import billing from "./routes/billing";
 
@@ -40,7 +41,8 @@ const routes = app
   .route("/ide", ide)
   .route("/ide/ui", ideUi)
   .route("/ide/files", files)
-  .route("/ide/inline", inline);
+  .route("/ide/inline", inline)
+  .route("/ide/index", indexer);
 
 export type AppType = typeof routes;
 // idleTimeout must be high, otherwise LLM tool calls might not complete
