@@ -326,6 +326,23 @@ export const THEMES: Theme[] = [
     },
   },
   {
+    name: "Yuktiio",
+    colors: {
+      primary: "#3B82F6",
+      planMode: "#8B5CF6",
+      selection: "#8B5CF6",
+      thinking: "#8B5CF6",
+      success: "#82E0AA",
+      error: "#E74C5E",
+      info: "#56D6C2",
+      background: "#000000",
+      surface: "#09090B",
+      dialogSurface: "#0A0A10",
+      thinkingBorder: "#34344A",
+      dimSeparator: "#4E4E66",
+    },
+  },
+  {
     name: "Minimal Dark",
     colors: {
       primary: "#A78BFA",
