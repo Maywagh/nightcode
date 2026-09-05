@@ -5,6 +5,7 @@ import { requireAuth } from "./middleware/require-auth";
 import sessions from "./routes/sessions";
 import chat from "./routes/chat";
 import devChat from "./routes/dev-chat";
+import ide from "./routes/ide";
 import auth from "./routes/auth";
 import billing from "./routes/billing";
 
@@ -23,6 +24,7 @@ app.onError((error, c) => {
 
 app.use("/sessions/*", requireAuth);
 app.use("/chat/*", requireAuth);
+app.use("/ide/*", requireAuth);
 app.use("/billing/checkout", requireAuth);
 app.use("/billing/portal", requireAuth);
 
@@ -31,7 +33,8 @@ const routes = app
   .route("/auth", auth)
   .route("/billing", billing)
   .route("/sessions", sessions)
-  .route("/chat", chat);
+  .route("/chat", chat)
+  .route("/ide", ide);
 
 export type AppType = typeof routes;
 // idleTimeout must be high, otherwise LLM tool calls might not complete
