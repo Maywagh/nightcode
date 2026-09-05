@@ -6,7 +6,7 @@ import sessions from "./routes/sessions";
 import chat from "./routes/chat";
 import devChat from "./routes/dev-chat";
 import ide from "./routes/ide";
-import ideUi from "./routes/ide-ui2";
+import ideUi from "./routes/ide-ui";
 import files from "./routes/files";
 import inline from "./routes/inline";
 import indexer from "./routes/indexer";
