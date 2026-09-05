@@ -33,6 +33,13 @@ app.onError((error, c) => {
 
 app.use("/sessions/*", requireAuth);
 app.use("/chat/*", requireAuth);
+// Dev bypass: set a fake userId when DEV_BYPASS_AUTH is enabled so local IDE can be used without OAuth
+app.use("/ide/*", async (c, next) => {
+  if (process.env.DEV_BYPASS_AUTH === "true") {
+    c.set('userId', 'dev-user');
+  }
+  return await next();
+});
 app.use("/ide/*", requireAuth);
 app.use("/ide/*", rateLimit({ capacity: 120, refillPerSec: 2 }));
 app.use("/billing/checkout", requireAuth);
