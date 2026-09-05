@@ -1,6 +1,8 @@
 import { reindexWorkspace } from './indexer';
-import { watch } from 'fs';
 import { resolve } from 'path';
+
+let chokidar: any;
+try { chokidar = require('chokidar'); } catch (e) { chokidar = null; }
 
 let debounce: NodeJS.Timeout | null = null;
 
@@ -19,19 +21,28 @@ function scheduleReindex(root?: string) {
 export function startWatcher(rootPath?: string) {
   const root = resolve(rootPath || process.cwd());
   try {
-    // fs.watch with recursive true works on Windows and macOS.
-    const w = watch(root, { recursive: true }, (eventType, filename) => {
-      if (!filename) return;
-      if (filename.includes('node_modules') || filename.includes('.git')) return;
-      // schedule reindex
+    if (chokidar) {
+      const watcher = chokidar.watch(root, { ignored: /(^|[\\/\\\\])\.(git|node_modules)/, persistent: true, ignoreInitial: false });
+      watcher.on('all', (event: string, path: string) => {
+        if (!path) return;
+        scheduleReindex(root);
+      });
+      // initial index
       scheduleReindex(root);
-    });
-
-    // initial index
-    scheduleReindex(root);
-
-    console.log('File watcher started on', root);
-    return w;
+      console.log('Chokidar watcher started on', root);
+      return watcher;
+    } else {
+      // fallback to fs.watch
+      const { watch } = require('fs');
+      const w = watch(root, { recursive: true }, (_eventType: any, filename: string) => {
+        if (!filename) return;
+        if (filename.includes('node_modules') || filename.includes('.git')) return;
+        scheduleReindex(root);
+      });
+      scheduleReindex(root);
+      console.log('FS.watch fallback watcher started on', root);
+      return w;
+    }
   } catch (err) {
     console.error('Failed to start watcher', err);
     return null;
