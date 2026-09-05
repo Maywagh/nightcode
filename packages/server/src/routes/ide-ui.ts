@@ -212,6 +212,30 @@ app.get("/", (c) => {
       // initial load
       loadFileList('.');
 
+      // Register Monaco inline completion provider (calls server /ide/inline)
+      monaco.languages.registerCompletionItemProvider('javascript', {
+        triggerCharacters: ['.', '\\n', '\\t', ' '],
+        provideCompletionItems: async (model, position) => {
+          try {
+            const code = editor.getModel().getValue();
+            const offset = model.getOffsetAt(position);
+            const res = await fetch('/ide/inline', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, cursor: offset, model: DEFAULT_MODEL }) });
+            const json = await res.json();
+            const items = (json.items || []).map((it) => ({
+              label: it.label || it.insertText.slice(0, 40),
+              kind: monaco.languages.CompletionItemKind.Snippet,
+              insertText: it.insertText,
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            }));
+
+            return { suggestions: items };
+          } catch (err) {
+            console.error('Inline completion failed', err);
+            return { suggestions: [] };
+          }
+        }
+      });
+
       // Ctrl+Space to trigger completion
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, () => {
         document.getElementById('btn-complete').click();
